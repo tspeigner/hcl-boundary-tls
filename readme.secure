@@ -15,3 +15,6 @@ export AWS_SECRET_ACCESS_KEY="2WkoTOUiBc56zqrke/jxg8HiWOL/F6TBCXOzG4pf"
 
 HCP Cluster URL
 https://a7318bfe-18ce-42ce-9d85-30be7e3946d9.boundary.hashicorp.cloud/
+
+vault_bootstrap_command = "ssh -i <path_to_private_key> ubuntu@54.211.64.114 'cat /home/ubuntu/vault-init.json'"
+vault_server_public_ip = "54.211.64.114"

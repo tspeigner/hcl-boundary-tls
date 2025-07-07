@@ -2,8 +2,11 @@
 - name: Configure Vault and Boundary Server
   hosts: server
   become: yes
+  vars:
+    # This password is for bootstrapping only. Vault will rotate it immediately.
+    postgres_bootstrap_password: "ThisIsAReallyBadPassword123!"
   roles:
-    # We will create these roles in the next steps
     - role: vault
-    # - role: boundary # We'll get to this one next
+    - role: postgres
+    - role: vault_db_config
     - role: ping_test

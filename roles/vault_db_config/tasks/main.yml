@@ -1,16 +1,4 @@
 ---
-# Read vault credentials from the vault init file
-- name: Read vault credentials from remote file
-  ansible.builtin.slurp:
-    src: /home/ubuntu/vault-init.json
-  register: vault_init_file
-
-- name: Set Vault environment variables
-  ansible.builtin.set_fact:
-    vault_env:
-      VAULT_ADDR: "http://127.0.0.1:8200"
-    vault_root_token: "{{ (vault_init_file.content | b64decode | from_json).root_token }}"
-
 # --- Test 1: Write and Read a K/V Secret ---
 - name: "TEST 1.1 | Enable KV v2 secrets engine at path 'secret'"
   ansible.builtin.command: "vault secrets enable -path=secret kv-v2"

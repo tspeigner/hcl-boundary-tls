@@ -4,7 +4,25 @@
 
 # The public SSH key to be installed on EC2 instances for access.
 # Example: public_key = "ssh-rsa AAAA..."
-public_key = ""
+public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC099rsIQ9Kr83MwSj63+XyRLIhVmttHZxCT43U5UKSTBKFa8MWby6U94uqAA7+wnHOWgacvv0AaLC5yp6iKP7zZVVmQTFjBQoeep9cTqLJQEhG5RNl9P9ziRc3TIjz557AoLQbyzs/57adGek2S7NtnZOj7i70+o4cBOtu2Y/bSQJRIq2S4qNUJILyx4sd0QmQk9JyvRsv1Q8fu+Pmu0PsMTl51BwZXF3Twf8OHbGJIel5V5V3iuXfS9EwoaEwpoL97rZlE5EmVQBU+Hg4gNH2YByiQe0fnoiYEvfqRIRuB7/AGlPRMNhEfIDIEAh+zwnUkHJf9Pb8mATIcXlf5Qf6b4eWazUhlV2dHd0lajViLcTRMrKFpwXjiS3tEWXugEIJbv9LVxV941vsLdobwegTpAfKFRKebGp8f14qSduYkmwuL1Y4BSqjztL5g5pRFpfoJYECzPym5TddtItRhoa23VZRpvNKFeJvJ8XAt+yWNG3fGv50zOKbNwkU/e1TNvqMiEn3iX98kmAkV19FSDbsCzBaKMoS8bTNQSTzAln1PnZOvs1qJJD2RpGFgeB5sYblQ8jMC1WdHc+2zqKMIf9Idg684V5dwk32FT9Nuq/zbfoeI1IAG+mTC0L2BgYtLc35WTw9+oG5arsZdwR0mxH1z1W40xM8QZFbhnc4RBvc6Q== tlsoob@pm.me"
+
+
+# ------------------------------------------------------------------------------
+# HashiCorp Cloud Platform (HCP) Configuration
+# ------------------------------------------------------------------------------
+
+# The URL of the HCP Boundary cluster.
+# Example: hcp_boundary_cluster_url = "https://<id>.boundary.hashicorp.cloud"
+hcp_boundary_cluster_url = ""
+
+# The ID of the HCP Boundary project (e.g., p_...).
+hcp_boundary_project_id = ""
+
+# The ID of the password auth method for Boundary (e.g., ampw_...).
+boundary_auth_method_id = ""
+
+# The password for the Boundary user specified in the provider configuration.
+boundary_admin_password = ""
 
 # ------------------------------------------------------------------------------
 # Vault Configuration
@@ -16,3 +34,6 @@ public_key = ""
 
 # The version of Vault to install.
 # vault_version = "1.15.2"
+
+# The version of the Boundary worker to install.
+# boundary_version = "0.14.1"

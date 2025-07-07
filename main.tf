@@ -106,23 +106,6 @@ resource "aws_security_group" "server" {
   tags = local.tags
 }
 
-resource "aws_security_group" "postgres" {
-  name        = "${var.project_name}-postgres-sg"
-  description = "Allow traffic to the PostgreSQL server"
-  vpc_id      = aws_vpc.main.id
-
-  # Ingress rules will be added later to allow access from Vault and Boundary workers.
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"] # Allows DB to fetch packages if needed
-  }
-
-  tags = local.tags
-}
-
 # ------------------------------------------------------------------------------
 # BOUNDARY
 # ------------------------------------------------------------------------------

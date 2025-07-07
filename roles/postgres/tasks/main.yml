@@ -1,0 +1,36 @@
+---
+- name: Install PostgreSQL and dependencies
+  ansible.builtin.apt:
+    name:
+      - postgresql
+      - python3-psycopg2
+    state: present
+    update_cache: yes
+
+- name: Ensure PostgreSQL service is running and enabled
+  ansible.builtin.systemd:
+    name: postgresql
+    state: started
+    enabled: yes
+
+- name: Create the application database
+  community.postgresql.postgresql_db:
+    name: myapp
+  become_user: postgres
+
+- name: Create the bootstrap database user for Vault
+  community.postgresql.postgresql_user:
+    name: bootstrap_user
+    password: "{{ postgres_bootstrap_password }}"
+    role_attr_flags: "LOGIN,CREATEROLE"
+    db: myapp
+    priv: "ALL"
+  become_user: postgres
+  no_log: true # Do not log the password
+
+- name: Wait for PostgreSQL to be ready before proceeding
+  ansible.builtin.wait_for:
+    host: 127.0.0.1
+    port: 5432
+    delay: 5
+    timeout: 60

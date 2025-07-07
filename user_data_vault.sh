@@ -96,7 +96,7 @@ vault operator unseal $VAULT_UNSEAL_KEY
 # # ---
 
 # # Install Boundary
-# curl -sSL https://releases.hashicorp.com/boundary/BOUNDARY_VERSION/boundary_BOUNDARY_VERSION_linux_amd64.zip -o boundary.zip
+# curl -sSL https://releases.hashicorp.com/boundary/$${boundary_version}/boundary_$${boundary_version}_linux_amd64.zip -o boundary.zip
 # unzip boundary.zip
 # sudo mv boundary /usr/local/bin/
 # rm boundary.zip

@@ -1,0 +1,138 @@
+---
+- name: Install dependencies
+  ansible.builtin.apt:
+    name:
+      - unzip
+      - jq
+    state: present
+    update_cache: yes
+
+- name: Download and unarchive Vault
+  ansible.builtin.unarchive:
+    src: "https://releases.hashicorp.com/vault/{{ vault_version }}/vault_{{ vault_version }}_linux_amd64.zip"
+    dest: /usr/local/bin
+    remote_src: yes
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Create Vault user
+  ansible.builtin.user:
+    name: vault
+    system: yes
+    shell: /bin/false
+    home: /etc/vault.d
+
+- name: Create Vault directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: vault
+    group: vault
+    mode: '0755'
+  loop:
+    - /etc/vault.d
+    - /opt/vault/data
+
+- name: Create Vault config file
+  ansible.builtin.template:
+    src: vault.hcl.j2
+    dest: /etc/vault.d/vault.hcl
+    owner: vault
+    group: vault
+    mode: '0640'
+  notify: restart vault
+
+- name: Create systemd service file
+  ansible.builtin.template:
+    src: vault.service.j2
+    dest: /etc/systemd/system/vault.service
+    mode: '0644'
+  notify: restart vault
+
+- name: Ensure Vault service is running and enabled
+  ansible.builtin.systemd:
+    name: vault
+    state: started
+    enabled: yes
+
+- name: Wait for Vault API and capture logs on failure
+  block:
+    - name: Wait for Vault to be ready
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:8200/v1/sys/health"
+        # We check for all possible "up" states: unsealed, sealed, or uninitialized
+        status_code: [200, 429, 501, 503]
+      register: vault_health
+      until: vault_health.status != -1
+      retries: 30
+      delay: 2
+  rescue:
+    - name: Get Vault service logs if it failed to start
+      ansible.builtin.command: journalctl -u vault.service --no-pager
+      register: vault_logs
+      changed_when: false
+
+    - name: Display Vault service logs
+      ansible.builtin.debug:
+        var: vault_logs.stdout_lines
+
+    - name: Fail the playbook
+      ansible.builtin.fail:
+        msg: "Vault service failed to start. Please check the logs above."
+
+- name: Display initial Vault health status
+  ansible.builtin.debug:
+    msg: "Vault health check successful. Initialized: {{ vault_health.json.initialized }}, Sealed: {{ vault_health.json.sealed | default('N/A') }}"
+
+- name: Initialize Vault if necessary
+  block:
+    - name: Initialize Vault as it is not already initialized
+      ansible.builtin.command: "vault operator init -key-shares=1 -key-threshold=1 -format=json"
+      environment:
+        VAULT_ADDR: "http://127.0.0.1:8200"
+      register: vault_init_result
+      changed_when: true
+
+    - name: Persist vault credentials to the remote host
+      ansible.builtin.copy:
+        content: "{{ vault_init_result.stdout }}"
+        dest: /home/ubuntu/vault-init.json
+        owner: ubuntu
+        group: ubuntu
+        mode: '0600'
+
+    - name: Refresh vault health status after initialization
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:8200/v1/sys/health"
+        status_code: [200, 429, 501, 503]
+      register: vault_health # Overwrite the old vault_health variable
+  when: not vault_health.json.initialized
+
+- name: Ensure Vault is unsealed before proceeding
+  block:
+    - name: Check current Vault seal status
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:8200/v1/sys/health"
+        status_code: [200, 503] # 200=unsealed, 503=sealed
+      register: current_vault_health
+
+    - name: Unseal Vault if currently sealed
+      block:
+        - name: Read vault credentials from remote file
+          ansible.builtin.slurp:
+            src: /home/ubuntu/vault-init.json
+          register: vault_init_file
+
+        - name: Unseal Vault using key from file
+          ansible.builtin.command: "vault operator unseal {{ (vault_init_file.content | b64decode | from_json).unseal_keys_b64[0] }}"
+          environment:
+            VAULT_ADDR: "http://127.0.0.1:8200"
+          changed_when: true
+
+        - name: Final check to confirm Vault is unsealed and ready
+          ansible.builtin.uri:
+            url: "http://127.0.0.1:8200/v1/sys/health"
+            status_code: 200 # A 200 status code means initialized and unsealed
+          changed_when: false
+      when: current_vault_health.json.sealed | default(false)

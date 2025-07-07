@@ -1,0 +1,17 @@
+readme.secure
+
+service principal name: boundary-demo-worker
+service principal: boundary-demo-worker-613918@03b810a9-ef41-4af3-8bf8-92d1633a117c
+resource name: iam/organization/03b810a9-ef41-4af3-8bf8-92d1633a117c/service-principal/boundary-demo-worker
+client id: pD8T8Zv9vGkaPNmiSG7THB3yY3YMgYOi
+client secret: EBdGZv_GVz_sWOwbAF9DW0m_EBgreehLrF8etqAJ_i1YgdIcKUXaDsTNQD7EvPIc
+org id: o_boEJUAwVA2
+project id: p_fYJrjdzV7b
+auth method id: ampw_szSdaMIMPs
+
+AWS
+export AWS_ACCESS_KEY_ID="ASIAWN26J3HWYTLR5DVN"
+export AWS_SECRET_ACCESS_KEY="2WkoTOUiBc56zqrke/jxg8HiWOL/F6TBCXOzG4pf"
+
+HCP Cluster URL
+https://a7318bfe-18ce-42ce-9d85-30be7e3946d9.boundary.hashicorp.cloud/

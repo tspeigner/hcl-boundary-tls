@@ -1,0 +1,9 @@
+---
+- name: Configure Vault and Boundary Server
+  hosts: server
+  become: yes
+  roles:
+    # We will create these roles in the next steps
+    - role: vault
+    # - role: boundary # We'll get to this one next
+    - role: ping_test

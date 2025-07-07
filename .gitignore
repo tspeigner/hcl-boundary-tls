@@ -1,0 +1,27 @@
+# Local .tfvars files
+#
+# Include any files that contain sensitive data, such as passwords,
+# private keys, and other secrets. These files should not be part of
+# the version control system.
+terraform.tfvars
+*.auto.tfvars
+
+# Local Terraform state files
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Ignore the .terraform directory that contains provider plugins
+.terraform/
+
+# Ignore plan files
+*.tfplan
+
+# Ignore generated Ansible inventory
+inventory.ini
+
+# Ignore generated Ansible inventory
+inventory.ini
